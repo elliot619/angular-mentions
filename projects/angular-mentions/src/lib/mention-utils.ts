@@ -160,7 +160,7 @@ function localToRelativeCoordinates(
   obj = <HTMLElement>element;
   iframe = ctx ? ctx.iframe : null;
   while (obj !== getDocument(null).body && obj != null) {
-    if (ctx.parent != null && ctx.parent == obj) {
+    if (ctx.parent != null && ctx.parent === obj) {
       break;
     }
     if (obj.scrollTop && obj.scrollTop > 0) {
