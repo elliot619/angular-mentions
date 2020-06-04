@@ -24,9 +24,7 @@ export function insertValue(
   wrapInHTML: { htmlTag: string; class: string } = null
 ) {
   //console.log("insertValue", el.nodeName, start, end, "["+text+"]", el);
-
-  console.log(wrapInHTML);
-
+  
   if (isTextElement(el)) {
     if (wrapInHTML) {
       text = `<${wrapInHTML.htmlTag} class="${wrapInHTML.class}">${text}</${wrapInHTML.htmlTag}>`;
