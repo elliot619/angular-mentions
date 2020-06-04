@@ -5,8 +5,7 @@ function setValue(el: HTMLInputElement, value: any) {
   //console.log("setValue", el.nodeName, "["+value+"]");
   if (isInputOrTextAreaElement(el)) {
     el.value = value;
-  }
-  else {
+  } else {
     el.textContent = value;
   }
 }
@@ -21,15 +20,25 @@ export function insertValue(
   end: number,
   text: string,
   iframe: HTMLIFrameElement,
-  noRecursion: boolean = false
+  noRecursion: boolean = false,
+  wrapInHTML: { htmlTag: string; class: string } = null
 ) {
   //console.log("insertValue", el.nodeName, start, end, "["+text+"]", el);
+
+  console.log(wrapInHTML);
+
   if (isTextElement(el)) {
+    if (wrapInHTML) {
+      text = `<${wrapInHTML.htmlTag} class="${wrapInHTML.class}">${text}</${wrapInHTML.htmlTag}>`;
+    }
+
     let val = getValue(el);
-    setValue(el, val.substring(0, start) + text + val.substring(end, val.length));
+    setValue(
+      el,
+      val.substring(0, start) + text + val.substring(end, val.length)
+    );
     setCaretPosition(el, start + text.length, iframe);
-  }
-  else if (!noRecursion) {
+  } else if (!noRecursion) {
     let selObj: Selection = getWindowSelection(iframe);
     if (selObj && selObj.rangeCount > 0) {
       var selRange = selObj.getRangeAt(0);
@@ -38,26 +47,42 @@ export function insertValue(
       // if (text.endsWith(' ')) {
       //   text = text.substring(0, text.length-1) + '\xA0';
       // }
-      insertValue(<HTMLInputElement>anchorNode, position - (end - start), position, text, iframe, true);
+      insertValue(
+        <HTMLInputElement>anchorNode,
+        position - (end - start),
+        position,
+        text,
+        iframe,
+        true,
+        wrapInHTML
+      );
     }
   }
 }
 
 export function isInputOrTextAreaElement(el: HTMLElement): boolean {
-  return el != null && (el.nodeName == 'INPUT' || el.nodeName == 'TEXTAREA');
-};
+  return el != null && (el.nodeName == "INPUT" || el.nodeName == "TEXTAREA");
+}
 
 export function isTextElement(el: HTMLElement): boolean {
-  return el != null && (el.nodeName == 'INPUT' || el.nodeName == 'TEXTAREA' || el.nodeName == '#text');
-};
+  return (
+    el != null &&
+    (el.nodeName == "INPUT" ||
+      el.nodeName == "TEXTAREA" ||
+      el.nodeName == "#text")
+  );
+}
 
-export function setCaretPosition(el: HTMLInputElement, pos: number, iframe: HTMLIFrameElement = null) {
+export function setCaretPosition(
+  el: HTMLInputElement,
+  pos: number,
+  iframe: HTMLIFrameElement = null
+) {
   //console.log("setCaretPosition", pos, el, iframe==null);
   if (isInputOrTextAreaElement(el) && el.selectionStart) {
     el.focus();
     el.setSelectionRange(pos, pos);
-  }
-  else {
+  } else {
     let range = getDocument(iframe).createRange();
     range.setStart(el, pos);
     range.collapse(true);
@@ -67,13 +92,15 @@ export function setCaretPosition(el: HTMLInputElement, pos: number, iframe: HTML
   }
 }
 
-export function getCaretPosition(el: HTMLInputElement, iframe: HTMLIFrameElement = null) {
+export function getCaretPosition(
+  el: HTMLInputElement,
+  iframe: HTMLIFrameElement = null
+) {
   //console.log("getCaretPosition", el);
   if (isInputOrTextAreaElement(el)) {
     var val = el.value;
     return val.slice(0, el.selectionStart).length;
-  }
-  else {
+  } else {
     var selObj = getWindowSelection(iframe); //window.getSelection();
     if (selObj.rangeCount > 0) {
       var selRange = selObj.getRangeAt(0);
@@ -105,9 +132,18 @@ function getWindowSelection(iframe: HTMLIFrameElement): Selection {
   }
 }
 
-export function getContentEditableCaretCoords(ctx: { iframe: HTMLIFrameElement, parent?: Element }) {
-  let markerTextChar = '\ufeff';
-  let markerId = 'sel_' + new Date().getTime() + '_' + Math.random().toString().substr(2);
+export function getContentEditableCaretCoords(ctx: {
+  iframe: HTMLIFrameElement;
+  parent?: Element;
+}) {
+  let markerTextChar = "\ufeff";
+  let markerId =
+    "sel_" +
+    new Date().getTime() +
+    "_" +
+    Math.random()
+      .toString()
+      .substr(2);
   let doc = getDocument(ctx ? ctx.iframe : null);
   let sel = getWindowSelection(ctx ? ctx.iframe : null);
   let prevRange = sel.getRangeAt(0);
@@ -120,7 +156,7 @@ export function getContentEditableCaretCoords(ctx: { iframe: HTMLIFrameElement, 
 
   // Create the marker element containing a single invisible character
   // using DOM methods and insert it at the position in the range
-  let markerEl = doc.createElement('span');
+  let markerEl = doc.createElement("span");
   markerEl.id = markerId;
   markerEl.appendChild(doc.createTextNode(markerTextChar));
   range.insertNode(markerEl);
@@ -139,7 +175,7 @@ export function getContentEditableCaretCoords(ctx: { iframe: HTMLIFrameElement, 
 }
 
 function localToRelativeCoordinates(
-  ctx: { iframe: HTMLIFrameElement, parent?: Element },
+  ctx: { iframe: HTMLIFrameElement; parent?: Element },
   element: Element,
   coordinates: { top: number; left: number }
 ) {
