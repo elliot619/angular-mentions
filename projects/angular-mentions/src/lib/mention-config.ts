@@ -3,9 +3,11 @@
 export interface MentionConfig extends Mentions {
   // nested config
   mentions?:Mentions[];
-  
+
   // option to disable encapsulated styles so global styles can be used instead
-  disableStyle?:boolean;  
+  disableStyle?:boolean;
+
+  insertHTML?:boolean;
 }
 
 export interface Mentions {

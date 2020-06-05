@@ -25,4 +25,9 @@ export class AppComponent {
       default          : return null;
     }
   }
+
+  prettyfyItem(item:any){
+    return `<span style="color:red;" contenteditable="false">${item.label}</span>`;
+  }
+
 }
