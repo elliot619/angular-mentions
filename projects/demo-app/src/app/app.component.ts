@@ -27,7 +27,11 @@ export class AppComponent {
   }
 
   prettyfyItem(item:any){
-    return `<span style="color:red;" contenteditable="false">${item.label}</span>`;
+    const element=document.createElement('span');
+    element.style.color='red';
+    element.contentEditable='false';
+    element.innerText=item.label;
+    return element;
   }
 
 }
